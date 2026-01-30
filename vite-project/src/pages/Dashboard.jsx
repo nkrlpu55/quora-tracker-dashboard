@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { checkAndApplyMissedPenalties } from "../utils/missedTaskAutomation";
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
@@ -24,6 +25,7 @@ export default function Dashboard() {
   };
 
   loadUser();
+  checkAndApplyMissedPenalties();
   }, []);
 
   if (!userData) return <p>Loading...</p>;

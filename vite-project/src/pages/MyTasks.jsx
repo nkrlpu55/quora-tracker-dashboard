@@ -8,105 +8,144 @@ import {
   addDoc,
   doc,
   updateDoc,
-  Timestamp
+  Timestamp,
+  increment
 } from "firebase/firestore";
+import {
+  calculateWorkingMinutes,
+  resolveScore
+} from "../utils/timeCalculator";
 
 export default function MyTasks() {
-  // Stores tasks assigned to this contributor
   const [tasks, setTasks] = useState([]);
-
-  // Stores pasted Quora answer link (input)
-  const [answerLink, setAnswerLink] = useState("");
-
-  // Stores submissions mapped by taskId
+  const [answerLinks, setAnswerLinks] = useState({});
   const [submissions, setSubmissions] = useState({});
+  const [loadingTaskId, setLoadingTaskId] = useState(null);
 
   // -----------------------------
-  // FETCH TASKS + SUBMISSIONS
+  // FETCH TASKS & SUBMISSIONS
   // -----------------------------
+  const fetchData = async () => {
+    const userId = localStorage.getItem("trackerUserId");
+
+    const taskQuery = query(
+      collection(db, "tasks"),
+      where("assignedTo", "==", userId)
+    );
+    const taskSnap = await getDocs(taskQuery);
+    const taskList = taskSnap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setTasks(taskList);
+
+    const subQuery = query(
+      collection(db, "submissions"),
+      where("userId", "==", userId)
+    );
+    const subSnap = await getDocs(subQuery);
+
+    const subMap = {};
+    subSnap.docs.forEach(doc => {
+      subMap[doc.data().taskId] = doc.data();
+    });
+    setSubmissions(subMap);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const userId = localStorage.getItem("trackerUserId");
-
-      // 1️⃣ Fetch assigned tasks
-      const taskQuery = query(
-        collection(db, "tasks"),
-        where("assignedTo", "==", userId)
-      );
-
-      const taskSnap = await getDocs(taskQuery);
-      const taskList = taskSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setTasks(taskList);
-
-      // 2️⃣ Fetch submissions done by this user
-      const subQuery = query(
-        collection(db, "submissions"),
-        where("userId", "==", userId)
-      );
-
-      const subSnap = await getDocs(subQuery);
-
-      const subMap = {};
-      subSnap.docs.forEach(doc => {
-        subMap[doc.data().taskId] = doc.data();
-      });
-
-      setSubmissions(subMap);
-    };
-
     fetchData();
   }, []);
 
   // -----------------------------
-  // SUBMIT ANSWER LINK
+  // SCORE PER TASK
   // -----------------------------
-  const submitAnswer = async (taskId, dueAt) => {
-    const userId = localStorage.getItem("trackerUserId");
+  const getTaskScore = (task) => {
+    if (task.status === "missed") return -5;
+    if (submissions[task.id]) return submissions[task.id].scoreDelta;
+    return null;
+  };
 
-    if (!answerLink) {
-      alert("Paste answer link");
+  // -----------------------------
+  // SUBMIT ANSWER
+  // -----------------------------
+  const submitAnswer = async (task) => {
+    const link = answerLinks[task.id];
+
+    if (!link || !link.trim()) {
+      alert("Please paste the answer link before submitting");
       return;
     }
 
-    const isLate = Timestamp.now().toMillis() > dueAt.toMillis();
+    if (task.status === "missed") {
+      alert("This task is missed. Submission is disabled.");
+      return;
+    }
 
-    // Save submission
-    await addDoc(collection(db, "submissions"), {
-      taskId,
-      userId,
-      answerLink,
-      submittedAt: Timestamp.now(),
-      isLate
-    });
+    setLoadingTaskId(task.id);
 
-    // Update task status
-    await updateDoc(doc(db, "tasks", taskId), {
-      status: "submitted"
-    });
-
-    alert("Answer submitted successfully");
-
-    // Update UI instantly (no page reload)
-    setSubmissions(prev => ({
-      ...prev,
-      [taskId]: {
-        answerLink,
-        submittedAt: Timestamp.now(),
-        isLate
+    try {
+      if (!task.assignedAt) {
+        throw new Error("Task assignedAt timestamp is missing");
       }
-    }));
 
-    setTasks(prev =>
-      prev.map(t =>
-        t.id === taskId ? { ...t, status: "submitted" } : t
-      )
-    );
+      const userId = localStorage.getItem("trackerUserId");
+      const submittedAt = Timestamp.now();
 
-    setAnswerLink("");
+      const workingMinutes = calculateWorkingMinutes(
+        task.assignedAt.toDate(),
+        submittedAt.toDate()
+      );
+
+      const scoreDelta = resolveScore(workingMinutes);
+
+      await addDoc(collection(db, "submissions"), {
+        taskId: task.id,
+        userId,
+        answerLink: link,
+        submittedAt,
+        workingMinutes,
+        scoreDelta
+      });
+
+      await updateDoc(doc(db, "tasks", task.id), {
+        status: "submitted"
+      });
+
+      await updateDoc(doc(db, "users", userId), {
+        score: increment(scoreDelta)
+      });
+
+      // Optimistic UI update
+      setTasks(prev =>
+        prev.map(t =>
+          t.id === task.id ? { ...t, status: "submitted" } : t
+        )
+      );
+
+      setSubmissions(prev => ({
+        ...prev,
+        [task.id]: {
+          taskId: task.id,
+          userId,
+          answerLink: link,
+          submittedAt,
+          scoreDelta
+        }
+      }));
+
+      setAnswerLinks(prev => {
+        const copy = { ...prev };
+        delete copy[task.id];
+        return copy;
+      });
+
+      alert(`Submission successful for Task ID: ${task.id}`);
+    } catch (error) {
+      console.error("Submission failed:", error.message);
+      alert(error.message);
+    } finally {
+      setLoadingTaskId(null);
+    }
   };
 
   // -----------------------------
@@ -118,84 +157,86 @@ export default function MyTasks() {
 
       {tasks.length === 0 && <p>No tasks assigned</p>}
 
-      {tasks.map(task => (
-        <div
-          key={task.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "12px",
-            margin: "12px"
-          }}
-        >
-          {/* QUESTION LINK */}
-          <p>
-            <b>Question:</b>{" "}
-            <a href={task.questionLink} target="_blank" rel="noreferrer">
-              {task.questionLink}
-            </a>
-          </p>
+      {tasks.map(task => {
+        const taskScore = getTaskScore(task);
 
-          {/* COLLAPSIBLE ADMIN ANSWER (READ-ONLY, COPYABLE) */}
-          <details>
-            <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
-              View Assigned Answer
-            </summary>
+        return (
+          <div
+            key={task.id}
+            style={{ border: "1px solid #ccc", padding: "12px", margin: "12px" }}
+          >
+            <p>
+              <b>Question:</b>{" "}
+              <a href={task.questionLink} target="_blank" rel="noreferrer">
+                {task.questionLink}
+              </a>
+            </p>
 
-            <textarea
-              value={task.answerText || ""}
-              readOnly
-              rows={6}
-              style={{ width: "100%", marginTop: "8px" }}
-            />
-          </details>
-
-          {/* TASK STATUS */}
-          <p>
-            <b>Status:</b> {task.status}
-          </p>
-
-          {/* IF ALREADY SUBMITTED – SHOW DETAILS */}
-          {submissions[task.id] && (
-            <>
-              <p style={{ color: "green" }}>
-                Answer submitted
-              </p>
-              <p>
-                <b>Post Link:</b>{" "}
-                <a
-                  href={submissions[task.id].answerLink}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  View Posted Answer
-                </a>
-              </p>
-              <p>
-                <b>Submitted At:</b>{" "}
-                {submissions[task.id].submittedAt
-                  .toDate()
-                  .toLocaleString()}
-              </p>
-            </>
-          )}
-
-          {/* SHOW INPUT ONLY IF PENDING */}
-          {/* Push test check */}
-          {task.status === "pending" && (
-            <>
-              <input
-                placeholder="Paste Quora Answer Link"
-                value={answerLink}
-                onChange={(e) => setAnswerLink(e.target.value)}
+            <details>
+              <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
+                View Assigned Answer
+              </summary>
+              <textarea
+                value={task.answerText || ""}
+                readOnly
+                rows={6}
+                style={{ width: "100%", marginTop: "8px" }}
               />
-              <br />
-              <button onClick={() => submitAnswer(task.id, task.dueAt)}>
-                Submit
-              </button>
-            </>
-          )}
-        </div>
-      ))}
+            </details>
+
+            <p>
+              <b>Status:</b>{" "}
+              <span
+                style={{
+                  color:
+                    task.status === "missed"
+                      ? "red"
+                      : task.status === "submitted"
+                      ? "green"
+                      : "black",
+                  fontWeight: "bold"
+                }}
+              >
+                {task.status}
+              </span>
+            </p>
+
+            <p>
+              <b>Score for this task:</b>{" "}
+              {taskScore === null ? "—" : (taskScore > 0 ? "+" : "") + taskScore}
+            </p>
+
+            {task.status === "pending" && (
+              <>
+                <input
+                  placeholder="Paste Quora Answer Link"
+                  value={answerLinks[task.id] || ""}
+                  onChange={(e) =>
+                    setAnswerLinks(prev => ({
+                      ...prev,
+                      [task.id]: e.target.value
+                    }))
+                  }
+                  disabled={loadingTaskId === task.id}
+                />
+                <br />
+                <button
+                  onClick={() => submitAnswer(task)}
+                  disabled={loadingTaskId === task.id || task.status !== "pending"}
+                >
+                  {loadingTaskId === task.id ? "Submitting..." : "Submit"}
+                </button>
+              </>
+            )}
+
+            {task.status === "missed" && (
+              <p style={{ color: "red", fontWeight: "bold" }}>
+                Submission closed for this task
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

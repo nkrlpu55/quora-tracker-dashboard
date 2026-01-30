@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminTasks from "./pages/AdminTasks";
 import MyTasks from "./pages/MyTasks";
+import Leaderboard from "./pages/Leaderboard";
 
 
 function App() {
