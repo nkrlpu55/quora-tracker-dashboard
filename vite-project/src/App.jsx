@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminTasks from "./pages/AdminTasks";
 import MyTasks from "./pages/MyTasks";
 import Leaderboard from "./pages/Leaderboard";
-
+import AdminPerformance from "./pages/AdminPerformance";
 
 function App() {
   return (
@@ -13,6 +13,8 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/admin-tasks" element={<AdminTasks />} />
       <Route path="/my-tasks" element={<MyTasks />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/admin-performance" element={<AdminPerformance />} />
     </Routes>
   );
 }
