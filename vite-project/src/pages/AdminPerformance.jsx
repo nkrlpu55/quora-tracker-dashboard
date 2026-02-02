@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { rebuildUserScores } from "../utils/rebuildScores";
+
 
 export default function AdminPerformance() {
   const [users, setUsers] = useState([]);
@@ -31,35 +33,54 @@ export default function AdminPerformance() {
     return users
       .filter(u => u.role === "user")
       .map(user => {
+        // Tasks assigned to user
         const userTasks = tasks.filter(t => t.assignedTo === user.id);
+
+        // All submissions by user
         const userSubs = submissions.filter(s => s.userId === user.id);
 
-        const submittedTasks = userTasks.filter(t => t.status === "submitted").length;
-        const missedTasks = userTasks.filter(t => t.status === "missed").length;
+        // Keep ONLY latest submission per task
+        const latestSubByTask = {};
 
-        const totalScore = user.score || 0;
+        userSubs.forEach(sub => {
+          const existing = latestSubByTask[sub.taskId];
+          if (
+            !existing ||
+            sub.submittedAt?.toMillis() > existing.submittedAt?.toMillis()
+          ) {
+            latestSubByTask[sub.taskId] = sub;
+          }
+        });
+
+        const finalSubs = Object.values(latestSubByTask);
+
+        const totalTasks = userTasks.length;
+        const submittedTasks = finalSubs.length;
+        const missedTasks = Math.max(0, totalTasks - submittedTasks);
+
+        const totalScore = finalSubs.reduce(
+          (sum, s) => sum + (s.scoreDelta || 0),
+          0
+        );
 
         const avgScore =
-          userSubs.length > 0
-            ? (
-                userSubs.reduce((sum, s) => sum + (s.scoreDelta || 0), 0) /
-                userSubs.length
-              ).toFixed(2)
+          submittedTasks > 0
+            ? (totalScore / submittedTasks).toFixed(2)
             : "0.00";
 
         const lastSubmission =
-          userSubs.length > 0
-            ? userSubs
-                .map(s => s.submittedAt?.toDate())
-                .filter(Boolean)
-                .sort((a, b) => b - a)[0]
-                ?.toLocaleString()
+          finalSubs.length > 0
+            ? finalSubs
+              .map(s => s.submittedAt?.toDate())
+              .filter(Boolean)
+              .sort((a, b) => b - a)[0]
+              .toLocaleString()
             : "—";
 
         return {
           id: user.id,
           name: user.name,
-          totalTasks: userTasks.length,
+          totalTasks,
           submittedTasks,
           missedTasks,
           totalScore,
@@ -69,6 +90,8 @@ export default function AdminPerformance() {
       });
   };
 
+
+
   const performance = buildPerformanceData();
 
   // -----------------------------
@@ -77,6 +100,22 @@ export default function AdminPerformance() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Admin Performance Dashboard</h2>
+
+      <button
+        onClick={async () => {
+          await rebuildUserScores();
+          alert("User scores rebuilt successfully");
+          window.location.reload();
+        }}
+        style={{
+          marginTop: "10px",
+          marginBottom: "20px",
+          padding: "8px 12px",
+          cursor: "pointer"
+        }}
+      >
+        Rebuild All User Scores
+      </button>
 
       {performance.length === 0 ? (
         <p>No contributor data available</p>

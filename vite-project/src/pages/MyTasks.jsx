@@ -111,7 +111,10 @@ export default function MyTasks() {
         status: "submitted"
       });
 
-      await updateDoc(doc(db, "users", userId), {
+      const userRef = doc(db, "users", userId);
+
+      // Ensure score exists before incrementing
+      await updateDoc(userRef, {
         score: increment(scoreDelta)
       });
 
@@ -192,8 +195,8 @@ export default function MyTasks() {
                     task.status === "missed"
                       ? "red"
                       : task.status === "submitted"
-                      ? "green"
-                      : "black",
+                        ? "green"
+                        : "black",
                   fontWeight: "bold"
                 }}
               >
