@@ -3,9 +3,10 @@ import { signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import "../styles/Login.css";
 
 export default function Login() {
-  const [mode, setMode] = useState(null); // "admin" | "user"
+  const [mode, setMode] = useState("select"); // select | admin | user
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,7 +14,9 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  // ADMIN LOGIN
+  // -----------------------------
+  // ADMIN LOGIN (UNCHANGED LOGIC)
+  // -----------------------------
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     try {
@@ -26,7 +29,9 @@ export default function Login() {
     }
   };
 
-  // CONTRIBUTOR LOGIN
+  // -----------------------------
+  // CONTRIBUTOR LOGIN (UNCHANGED LOGIC)
+  // -----------------------------
   const handleUserLogin = async (e) => {
     e.preventDefault();
 
@@ -46,66 +51,98 @@ export default function Login() {
 
       const snapshot = await getDocs(q);
 
-    //   if (snapshot.empty) {
-    //     alert("Invalid pass key");
-    //     return;
-    //   }
-        if (snapshot.empty) {
-  alert("Pass key not found in database");
-  return;
-    }
-
+      if (snapshot.empty) {
+        alert("Pass key not found in database");
+        return;
+      }
 
       const userDoc = snapshot.docs[0];
       localStorage.setItem("trackerUserId", userDoc.id);
       navigate("/dashboard");
     } catch (err) {
-    //   console.error(err);
-    //   alert("User login failed");
-    console.error("LOGIN ERROR:", err);
-    alert(err.message);
+      console.error("LOGIN ERROR:", err);
+      alert(err.message);
     }
   };
 
+  // -----------------------------
+  // UI
+  // -----------------------------
   return (
-    <div>
-      <h2>Quora Tracker Login</h2>
+    <div className="login-body">
+      <div className="blob one"></div>
+      <div className="blob two"></div>
 
-      {!mode && (
-        <>
-          <button onClick={() => setMode("admin")}>Login as Admin</button>
-          <br /><br />
-          <button onClick={() => setMode("user")}>Login as Contributor</button>
-        </>
-      )}
+      <div className="wrapper">
+        <div className="card">
+          <div className="logo">Qacker</div>
+          <div className="tagline">Quora Content Tracker</div>
 
-      {mode === "admin" && (
-        <form onSubmit={handleAdminLogin}>
-          <h3>Admin Login</h3>
-          <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-          <br />
-          <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-          <br />
-          <button>Login</button>
-          <br /><br />
-          <button type="button" onClick={() => setMode(null)}>Back</button>
-        </form>
-      )}
+          {/* ROLE SELECTION */}
+          {mode === "select" && (
+            <div className="role-buttons">
+              <button className="role-btn" onClick={() => setMode("admin")}>
+                Admin Login
+              </button>
+              <button className="role-btn" onClick={() => setMode("user")}>
+                Contributor Login
+              </button>
+            </div>
+          )}
 
-      {mode === "user" && (
-        <form onSubmit={handleUserLogin}>
-          <h3>Contributor Login</h3>
-          <input
-            placeholder="Enter Pass Key"
-            value={passKey}
-            onChange={(e) => setPassKey(e.target.value)}
-          />
-          <br />
-          <button>Enter</button>
-          <br /><br />
-          <button type="button" onClick={() => setMode(null)}>Back</button>
-        </form>
-      )}
+          {/* ADMIN FORM */}
+          {mode === "admin" && (
+            <form className="form active" onSubmit={handleAdminLogin}>
+              <div className="form-group">
+                <label>EMAIL</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>PASSWORD</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button className="btn">Login as Admin</button>
+
+              <div className="back" onClick={() => setMode("select")}>
+                ← Change login type
+              </div>
+            </form>
+          )}
+
+          {/* CONTRIBUTOR FORM */}
+          {mode === "user" && (
+            <form className="form active" onSubmit={handleUserLogin}>
+              <div className="form-group">
+                <label>PASS KEY</label>
+                <input
+                  type="password"
+                  value={passKey}
+                  onChange={(e) => setPassKey(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button className="btn">Enter Workspace</button>
+
+              <div className="back" onClick={() => setMode("select")}>
+                ← Change login type
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

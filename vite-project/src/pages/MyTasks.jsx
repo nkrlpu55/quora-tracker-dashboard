@@ -84,10 +84,6 @@ export default function MyTasks() {
     setLoadingTaskId(task.id);
 
     try {
-      if (!task.assignedAt) {
-        throw new Error("Task assignedAt timestamp is missing");
-      }
-
       const userId = localStorage.getItem("trackerUserId");
       const submittedAt = Timestamp.now();
 
@@ -111,10 +107,7 @@ export default function MyTasks() {
         status: "submitted"
       });
 
-      const userRef = doc(db, "users", userId);
-
-      // Ensure score exists before incrementing
-      await updateDoc(userRef, {
+      await updateDoc(doc(db, "users", userId), {
         score: increment(scoreDelta)
       });
 
@@ -142,9 +135,7 @@ export default function MyTasks() {
         return copy;
       });
 
-      alert(`Submission successful for Task ID: ${task.id}`);
     } catch (error) {
-      console.error("Submission failed:", error.message);
       alert(error.message);
     } finally {
       setLoadingTaskId(null);
@@ -155,8 +146,8 @@ export default function MyTasks() {
   // UI
   // -----------------------------
   return (
-    <div>
-      <h2>My Assigned Tasks</h2>
+    <div style={{ padding: "20px", background: "#f9fafb" }}>
+      <h2 style={{ marginBottom: "20px" }}>My Assigned Tasks</h2>
 
       {tasks.length === 0 && <p>No tasks assigned</p>}
 
@@ -166,8 +157,16 @@ export default function MyTasks() {
         return (
           <div
             key={task.id}
-            style={{ border: "1px solid #ccc", padding: "12px", margin: "12px" }}
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "12px",
+              padding: "16px",
+              marginBottom: "16px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.04)"
+            }}
           >
+            {/* QUESTION */}
             <p>
               <b>Question:</b>{" "}
               <a href={task.questionLink} target="_blank" rel="noreferrer">
@@ -175,40 +174,66 @@ export default function MyTasks() {
               </a>
             </p>
 
+            {/* ADMIN ANSWER */}
             <details>
-              <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
+              <summary style={{ cursor: "pointer", fontWeight: "600" }}>
                 View Assigned Answer
               </summary>
               <textarea
                 value={task.answerText || ""}
                 readOnly
                 rows={6}
-                style={{ width: "100%", marginTop: "8px" }}
+                style={{
+                  width: "100%",
+                  marginTop: "8px",
+                  padding: "8px",
+                  borderRadius: "6px",
+                  border: "1px solid #e5e7eb"
+                }}
               />
             </details>
 
-            <p>
-              <b>Status:</b>{" "}
+            {/* STATUS BADGE */}
+            <div style={{ marginTop: "10px" }}>
               <span
                 style={{
-                  color:
-                    task.status === "missed"
-                      ? "red"
-                      : task.status === "submitted"
-                        ? "green"
-                        : "black",
-                  fontWeight: "bold"
+                  padding: "4px 12px",
+                  borderRadius: "999px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  color: "white",
+                  background:
+                    task.status === "submitted"
+                      ? "#16a34a"
+                      : task.status === "missed"
+                        ? "#dc2626"
+                        : "#d97706"
                 }}
               >
-                {task.status}
+                {task.status.toUpperCase()}
               </span>
+            </div>
+
+            {/* SCORE */}
+            <p style={{ marginTop: "8px" }}>
+              <b>Score:</b>{" "}
+              {taskScore === null ? (
+                <span style={{ color: "#6b7280" }}>—</span>
+              ) : (
+                <span
+                  style={{
+                    fontWeight: "700",
+                    fontSize: "16px",
+                    color: taskScore > 0 ? "#16a34a" : "#dc2626"
+                  }}
+                >
+                  {taskScore > 0 ? "+" : ""}
+                  {taskScore}
+                </span>
+              )}
             </p>
 
-            <p>
-              <b>Score for this task:</b>{" "}
-              {taskScore === null ? "—" : (taskScore > 0 ? "+" : "") + taskScore}
-            </p>
-
+            {/* SUBMIT SECTION */}
             {task.status === "pending" && (
               <>
                 <input
@@ -221,19 +246,36 @@ export default function MyTasks() {
                     }))
                   }
                   disabled={loadingTaskId === task.id}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginTop: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid #e5e7eb"
+                  }}
                 />
-                <br />
                 <button
                   onClick={() => submitAnswer(task)}
-                  disabled={loadingTaskId === task.id || task.status !== "pending"}
+                  disabled={loadingTaskId === task.id}
+                  style={{
+                    marginTop: "10px",
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    opacity: loadingTaskId === task.id ? 0.6 : 1
+                  }}
                 >
-                  {loadingTaskId === task.id ? "Submitting..." : "Submit"}
+                  {loadingTaskId === task.id ? "Submitting…" : "Submit"}
                 </button>
               </>
             )}
 
             {task.status === "missed" && (
-              <p style={{ color: "red", fontWeight: "bold" }}>
+              <p style={{ color: "#dc2626", fontWeight: "600" }}>
                 Submission closed for this task
               </p>
             )}

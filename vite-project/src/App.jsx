@@ -5,6 +5,8 @@ import AdminTasks from "./pages/AdminTasks";
 import MyTasks from "./pages/MyTasks";
 import Leaderboard from "./pages/Leaderboard";
 import AdminPerformance from "./pages/AdminPerformance";
+import "./styles/theme.css";
+
 
 function App() {
   return (
