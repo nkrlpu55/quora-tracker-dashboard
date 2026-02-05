@@ -284,4 +284,13 @@ export default function MyTasks() {
       })}
     </div>
   );
+
+  //Testing scores
+  console.log("TEST SCORES");
+  console.log("60 min:", resolveScore(60));    // +5
+  console.log("180 min:", resolveScore(180));  // +3
+  console.log("300 min:", resolveScore(300));  // +1
+  console.log("420 min:", resolveScore(420));  // -1
+  console.log("600 min:", resolveScore(600));  // -3
+
 }

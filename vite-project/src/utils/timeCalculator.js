@@ -49,5 +49,6 @@ export function resolveScore(workingMinutes) {
   if (workingMinutes <= 120) return 5;
   if (workingMinutes <= 240) return 3;
   if (workingMinutes <= 360) return 1;
+  if (workingMinutes <= 480) return -1;
   return -3;
 }
