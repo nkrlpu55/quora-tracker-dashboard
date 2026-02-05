@@ -3,11 +3,15 @@ import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { checkAndApplyMissedPenalties } from "../utils/missedTaskAutomation";
+import "../styles/AdminDashboard.css";
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
+  // -----------------------------
+  // LOAD USER (UNCHANGED LOGIC)
+  // -----------------------------
   useEffect(() => {
     const loadUser = async () => {
       const userId = localStorage.getItem("trackerUserId");
@@ -29,158 +33,139 @@ export default function Dashboard() {
     checkAndApplyMissedPenalties();
   }, [navigate]);
 
+  // -----------------------------
+  // MOUSE FOLLOW EFFECT (UI ONLY)
+  // -----------------------------
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+      document.querySelectorAll(".admin-card").forEach(card => {
+        card.addEventListener("mousemove", (e) => {
+          const { left, top, width, height } = card.getBoundingClientRect();
+          const x = ((e.clientX - left) / width) * 100;
+          const y = ((e.clientY - top) / height) * 100;
+          card.style.background =
+            `radial-gradient(circle at ${x}% ${y}%, #ffffff 0%, #f9fafb 100%)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.background = "white";
+        });
+      });
+    }
+  }, []);
+
   if (!userData) return <p>Loading...</p>;
 
   return (
-    <div
-      style={{
-        padding: "24px",
-        background: "#f9fafb",
-        minHeight: "100vh"
-      }}
-    >
-      {/* HEADER */}
-      <div style={{ marginBottom: "24px" }}>
-        <h2 style={{ marginBottom: "4px" }}>
-          Welcome, {userData.name}
-        </h2>
-        <p style={{ color: "#6b7280", margin: 0 }}>
-          {userData.role === "admin"
-            ? "Manage tasks and monitor performance"
-            : "Track your assigned tasks and scores"}
-        </p>
+    <div className="admin-body">
+      {/* BACKGROUND DECOR */}
+      <div className="bg-decor">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
       </div>
 
-      {/* DASHBOARD CARDS */}
-      {userData.role === "admin" ? (
-        <>
-          <h3 style={{ marginBottom: "12px" }}>Admin Dashboard</h3>
+      <div className="admin-container">
+        {/* HEADER */}
+        <header className="admin-header">
+          <span className="badge">Qacker Workspace</span>
+          <h1>Welcome, {userData.name}</h1>
+          <p className="subtext">
+            {userData.role === "admin"
+              ? "Control center for Quora content operations and team analytics."
+              : "Track your tasks, submissions, and leaderboard position."}
+          </p>
+        </header>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "16px"
-            }}
-          >
+        {/* DASHBOARD */}
+        {userData.role === "admin" ? (
+          <main className="dashboard-grid">
             {/* ASSIGN TASKS */}
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "14px",
-                padding: "18px",
-                boxShadow: "0 6px 16px rgba(0,0,0,0.05)"
-              }}
-            >
-              <h4 style={{ marginBottom: "8px" }}>Assign Tasks</h4>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>
-                Create and assign Quora questions to contributors.
+            <div className="admin-card card-assign">
+              <h2 className="card-title">Assign Tasks</h2>
+              <p className="card-desc">
+                Distribute high-intent Quora questions to contributors.
               </p>
+
+              <div className="card-visual">
+                <svg viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" fill="#e0e7ff" className="pulse" />
+                  <rect x="50" y="65" width="100" height="14" rx="7" fill="#6366f1" className="floating" />
+                  <rect x="50" y="95" width="70" height="14" rx="7" fill="#818cf8" className="floating" />
+                  <rect x="50" y="125" width="85" height="14" rx="7" fill="#a5b4fc" className="floating" />
+                </svg>
+              </div>
+
               <button
+                className="btn btn-blue"
                 onClick={() => navigate("/admin-tasks")}
-                style={buttonStyle}
               >
-                Go to Task Assignment
+                Task Assignment →
               </button>
             </div>
 
             {/* PERFORMANCE */}
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "14px",
-                padding: "18px",
-                boxShadow: "0 6px 16px rgba(0,0,0,0.05)"
-              }}
-            >
-              <h4 style={{ marginBottom: "8px" }}>
-                Performance Dashboard
-              </h4>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>
-                View contributor performance, scores, and submissions.
+            <div className="admin-card card-perf">
+              <h2 className="card-title">Performance</h2>
+              <p className="card-desc">
+                Audit contributor scores, submissions, and rankings.
               </p>
+
+              <div className="card-visual">
+                <svg viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" fill="#d1fae5" className="pulse" />
+                  <path
+                    d="M40 140 Q 70 140 85 100 T 130 80 T 160 50"
+                    stroke="#10b981"
+                    strokeWidth="10"
+                    fill="none"
+                    strokeLinecap="round"
+                    className="floating"
+                  />
+                </svg>
+              </div>
+
               <button
+                className="btn btn-mint"
                 onClick={() => navigate("/admin-performance")}
-                style={buttonStyle}
               >
-                View Performance
+                Performance Hub →
               </button>
             </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <h3 style={{ marginBottom: "12px" }}>Contributor Dashboard</h3>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "16px"
-            }}
-          >
+          </main>
+        ) : (
+          <main className="dashboard-grid">
             {/* MY TASKS */}
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "14px",
-                padding: "18px",
-                boxShadow: "0 6px 16px rgba(0,0,0,0.05)"
-              }}
-            >
-              <h4 style={{ marginBottom: "8px" }}>My Tasks</h4>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>
-                View assigned Quora questions and submit answers.
+            <div className="admin-card card-assign">
+              <h2 className="card-title">My Tasks</h2>
+              <p className="card-desc">
+                View assigned questions and submit answers.
               </p>
+
               <button
+                className="btn btn-blue"
                 onClick={() => navigate("/my-tasks")}
-                style={buttonStyle}
               >
-                View My Tasks
+                View Tasks →
               </button>
             </div>
 
             {/* LEADERBOARD */}
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "14px",
-                padding: "18px",
-                boxShadow: "0 6px 16px rgba(0,0,0,0.05)"
-              }}
-            >
-              <h4 style={{ marginBottom: "8px" }}>Leaderboard</h4>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>
-                See how you rank among other contributors.
+            <div className="admin-card card-perf">
+              <h2 className="card-title">Leaderboard</h2>
+              <p className="card-desc">
+                See how you rank among the team.
               </p>
+
               <button
+                className="btn btn-mint"
                 onClick={() => navigate("/leaderboard")}
-                style={buttonStyle}
               >
-                View Leaderboard
+                View Leaderboard →
               </button>
             </div>
-          </div>
-        </>
-      )}
+          </main>
+        )}
+      </div>
     </div>
   );
 }
-
-/* -----------------------------
-   Shared Button Style
------------------------------ */
-const buttonStyle = {
-  marginTop: "10px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  padding: "8px 14px",
-  borderRadius: "8px",
-  fontWeight: "600",
-  cursor: "pointer"
-};

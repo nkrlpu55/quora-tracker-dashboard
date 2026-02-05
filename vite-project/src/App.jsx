@@ -6,7 +6,7 @@ import MyTasks from "./pages/MyTasks";
 import Leaderboard from "./pages/Leaderboard";
 import AdminPerformance from "./pages/AdminPerformance";
 import "./styles/theme.css";
-
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
       <Route path="/my-tasks" element={<MyTasks />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/admin-performance" element={<AdminPerformance />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </Routes>
   );
 }
