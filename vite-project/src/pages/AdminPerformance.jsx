@@ -152,7 +152,7 @@ export default function AdminPerformance() {
                 <th>Name</th>
                 <th>Total Tasks</th>
                 <th>Submitted</th>
-                <th>Missed</th>
+                <th>Pending</th>
                 <th>Total Score</th>
                 <th>Avg Score</th>
                 <th>Last Submission</th>
