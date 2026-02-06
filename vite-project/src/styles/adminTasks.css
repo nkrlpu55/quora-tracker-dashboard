@@ -5,10 +5,9 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .shape {
@@ -40,8 +39,6 @@
   backdrop-filter: blur(14px);
   border-radius: 24px;
   padding: 40px;
-  margin-top: 40px;
-  margin-bottom: 40px;
   width: 100%;
   max-width: 820px;
   box-shadow: 0 20px 40px rgba(0,0,0,.08);
@@ -55,8 +52,7 @@
 
 .header p {
   color: #64748b;
-  margin-top: 4px;
-  margin-bottom: 50px;
+  margin-top: 6px;
 }
 
 .input-group {
@@ -80,7 +76,7 @@
 
 .input-group label {
   position: absolute;
-  top: 18px;
+  top: 14px;
   left: 16px;
   color: #64748b;
   transition: .3s;
@@ -91,9 +87,8 @@
 .input-group input:not(:placeholder-shown) + label,
 .input-group textarea:focus + label,
 .input-group textarea:not(:placeholder-shown) + label,
-.input-group select:focus + label,
-.input-group.has-value label {
-  top: -16px;
+.input-group select:focus + label {
+  top: -20px;
   font-size: .8rem;
   font-weight: 600;
   color: #2563eb;
@@ -136,21 +131,3 @@
   box-shadow: 0 10px 20px rgba(16,185,129,.3);
   z-index: 100;
 }
-
-/* Responsive */
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .glass-card {
-    padding: 28px 22px;
-  }
-
-  .header h1 {
-    font-size: 1.6rem;
-  }
-}
-
-
-
