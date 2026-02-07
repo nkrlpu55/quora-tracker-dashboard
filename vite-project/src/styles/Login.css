@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
 
+
 :root {
   --bg: #f6f7fb;
   --card-bg: rgba(255, 255, 255, 0.65);
@@ -12,10 +13,12 @@
   --blob-2: #e2ecfd;
 }
 
+
 * {
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
+
 
 .login-body {
   height: 100vh;
@@ -26,6 +29,7 @@
   justify-content: center;
 }
 
+
 .blob {
   position: absolute;
   width: 420px;
@@ -35,11 +39,13 @@
   animation: drift 20s ease-in-out infinite alternate;
 }
 
+
 .blob.one {
   background: var(--blob-1);
   top: -10%;
   left: -10%;
 }
+
 
 .blob.two {
   background: var(--blob-2);
@@ -48,16 +54,19 @@
   animation-delay: -6s;
 }
 
+
 @keyframes drift {
   from { transform: translate(0, 0); }
   to { transform: translate(60px, -40px); }
 }
+
 
 .wrapper {
   width: 100%;
   max-width: 420px;
   padding: 20px;
 }
+
 
 .card {
   background: var(--card-bg);
@@ -70,10 +79,13 @@
   transition: box-shadow 0.4s ease;
 }
 
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+
+
 
 
 .logo {
@@ -81,6 +93,7 @@
   font-size: 2.4rem;
   font-weight: 600;
 }
+
 
 .tagline {
   text-align: center;
@@ -91,18 +104,22 @@
   text-transform: uppercase;
 }
 
+
 button {
   outline: none;
 }
+
 
 button:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+
 .role-buttons {
   display: grid;
   gap: 14px;
 }
+
 
 .role-btn {
   padding: 14px;
@@ -114,22 +131,27 @@ button:focus-visible {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+
 .role-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 20px rgba(0,0,0,0.08);
 }
 
+
 .form {
   display: none;
 }
+
 
 .form.active {
   display: block;
 }
 
+
 .form-group {
   margin-bottom: 16px;
 }
+
 
 label {
   font-size: 0.7rem;
@@ -139,6 +161,7 @@ label {
   letter-spacing: 0.06em;
 }
 
+
 input {
   width: 100%;
   padding: 13px 14px;
@@ -147,10 +170,12 @@ input {
   outline: none;
 }
 
+
 input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
+
 
 .btn {
   width: 100%;
@@ -164,6 +189,7 @@ input:focus {
   margin-top: 10px;
 }
 
+
 .back {
   margin-top: 14px;
   text-align: center;
@@ -171,3 +197,6 @@ input:focus {
   color: var(--text-muted);
   cursor: pointer;
 }
+
+
+
