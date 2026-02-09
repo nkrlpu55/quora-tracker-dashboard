@@ -484,6 +484,7 @@ export default function Dashboard() {
   };
 
   const stats = getStats();
+  const leaderboardRows = buildLeaderboard();
 
   // -----------------------------
   // UI COMPONENTS
@@ -901,54 +902,55 @@ export default function Dashboard() {
                 <h3 className="text-xl font-black mb-8 flex items-center gap-3">
                   <Award className="text-emerald-400" /> RANKING_BOARD
                 </h3>
-                <div className="space-y-4">
-                  {buildLeaderboard().slice(0, 10).map((player, index) => {
-                    const isCurrentUser = player.id === userData.id;
-                    const rankIcon = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`;
-                    
-                    return (
-                      <motion.div
-                        key={player.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`p-4 rounded-2xl border transition-all ${
-                          isCurrentUser
-                            ? 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                            : 'bg-slate-900/40 border-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className={`text-2xl font-black ${index < 3 ? '' : 'text-slate-500'}`}>
-                              {rankIcon}
-                            </div>
-                            <div>
-                              <p className={`text-sm font-black ${isCurrentUser ? 'text-emerald-400' : 'text-white'}`}>
+                <div className="overflow-x-auto">
+                  {leaderboardRows.length === 0 ? (
+                    <p className="text-slate-500 text-sm">No contributors found</p>
+                  ) : (
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-white/10 text-[9px] text-slate-500 uppercase tracking-widest">
+                          <th className="pb-3">Rank</th>
+                          <th className="pb-3">Name</th>
+                          <th className="pb-3 text-right">Total Score</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboardRows.map((player, index) => {
+                          const isCurrentUser = player.id === userData.id;
+                          const rankIcon =
+                            index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1;
+
+                          return (
+                            <motion.tr
+                              key={player.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.03 }}
+                              className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                                isCurrentUser ? "bg-emerald-500/5" : ""
+                              }`}
+                            >
+                              <td className="py-2 font-black text-slate-400">{rankIcon}</td>
+                              <td className="py-2 font-black text-white">
                                 {player.name}
-                                {isCurrentUser && <span className="ml-2 text-[10px] text-emerald-400">(YOU)</span>}
-                              </p>
-                              <p className="text-[10px] text-slate-500 font-mono">Level {player.level}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className={`text-lg font-black ${player.totalScore >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                              {player.totalScore > 0 ? '+' : ''}{player.totalScore}
-                            </p>
-                            <p className="text-[9px] text-slate-500 uppercase tracking-widest">XP</p>
-                          </div>
-                        </div>
-                        {index < 3 && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="mt-2 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
-                            style={{ width: `${(player.totalScore / Math.max(buildLeaderboard()[0]?.totalScore || 1, 1)) * 100}%` }}
-                          />
-                        )}
-                      </motion.div>
-                    );
-                  })}
+                                {isCurrentUser && (
+                                  <span className="ml-2 text-[9px] text-emerald-400">(YOU)</span>
+                                )}
+                              </td>
+                              <td
+                                className={`py-2 text-right font-black ${
+                                  player.totalScore >= 0 ? "text-emerald-400" : "text-rose-400"
+                                }`}
+                              >
+                                {player.totalScore > 0 ? "+" : ""}
+                                {player.totalScore}
+                              </td>
+                            </motion.tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </GlassCard>
             )}
