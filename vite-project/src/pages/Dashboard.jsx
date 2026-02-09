@@ -90,6 +90,7 @@ export default function Dashboard() {
   const [loadingTaskId, setLoadingTaskId] = useState(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [leaderboardRows, setLeaderboardRows] = useState([]);
+  const [localTaskScores, setLocalTaskScores] = useState({});
   const navigate = useNavigate();
 
   // -----------------------------
@@ -374,6 +375,12 @@ export default function Dashboard() {
 
       const scoreDelta = resolveScore(workingMinutes);
 
+      // Optimistically store score for this task so UI updates immediately
+      setLocalTaskScores(prev => ({
+        ...prev,
+        [task.id]: scoreDelta
+      }));
+
       await addDoc(collection(db, "submissions"), {
         taskId: task.id,
         userId,
@@ -390,6 +397,11 @@ export default function Dashboard() {
       await updateDoc(doc(db, "users", userId), {
         score: increment(scoreDelta)
       });
+
+      // Optimistically mark task as submitted so submit UI disappears instantly
+      setTasks(prev =>
+        prev.map(t => (t.id === task.id ? { ...t, status: "submitted" } : t))
+      );
 
       setAnswerLinks(prev => {
         const copy = { ...prev };
@@ -707,7 +719,8 @@ export default function Dashboard() {
                               const latestSub = taskSubs
                                 .slice()
                                 .sort((a, b) => (b.submittedAt?.toMillis?.() || 0) - (a.submittedAt?.toMillis?.() || 0))[0];
-                              const score = latestSub?.scoreDelta ?? 0;
+                              const baseScore = latestSub?.scoreDelta ?? 0;
+                              const score = localTaskScores[task.id] ?? baseScore;
                               const assignedDate = task.assignedAt?.toDate
                                 ? task.assignedAt.toDate().toLocaleDateString()
                                 : task.assignedAt;
@@ -737,14 +750,44 @@ export default function Dashboard() {
                                     </span>
                                   </td>
                                   <td className="py-3 px-4">
-                                    <a
-                                      href={task.questionLink}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="text-xs text-indigo-400 hover:text-white font-black line-clamp-2 break-all"
-                                    >
-                                      FETCH_TARGET
-                                    </a>
+                                    <div className="flex flex-col gap-2">
+                                      <a
+                                        href={task.questionLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-xs text-indigo-400 hover:text-white font-black line-clamp-2 break-all"
+                                      >
+                                        FETCH_TARGET
+                                      </a>
+                                      {!isAdmin && task.status === "pending" && (
+                                        <div className="flex gap-2">
+                                          <input
+                                            type="text"
+                                            placeholder="Paste answer link..."
+                                            className="bg-black/40 border border-white/10 rounded-2xl px-3 py-2 text-[10px] w-full focus:outline-none focus:border-indigo-500 transition-all font-mono placeholder:text-slate-700"
+                                            value={answerLinks[task.id] || ""}
+                                            onChange={(e) =>
+                                              setAnswerLinks((prev) => ({
+                                                ...prev,
+                                                [task.id]: e.target.value
+                                              }))
+                                            }
+                                            disabled={loadingTaskId === task.id}
+                                          />
+                                          <motion.button
+                                            whileHover={{ scale: 1.08, rotate: 4 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() =>
+                                              handleSubmitLiveLink(task, answerLinks[task.id])
+                                            }
+                                            disabled={loadingTaskId === task.id}
+                                            className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-2xl transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+                                          >
+                                            <Send size={14} />
+                                          </motion.button>
+                                        </div>
+                                      )}
+                                    </div>
                                   </td>
                                   <td className="py-3 px-4 hidden md:table-cell text-[10px] text-slate-400 font-mono">
                                     {assignedDate || "—"}
@@ -1147,7 +1190,8 @@ export default function Dashboard() {
                               (b.submittedAt?.toMillis?.() || 0) -
                               (a.submittedAt?.toMillis?.() || 0)
                           )[0];
-                        const score = latestSub?.scoreDelta ?? 0;
+                        const baseScore = latestSub?.scoreDelta ?? 0;
+                        const score = localTaskScores[task.id] ?? baseScore;
                         const dueDate = task.dueAt?.toDate
                           ? task.dueAt.toDate().toLocaleString()
                           : task.dueAt;
@@ -1180,19 +1224,47 @@ export default function Dashboard() {
                               </span>
                             </td>
                             <td className="py-3 px-3 align-top">
-                              <div className="flex flex-col gap-1">
-                                <a
-                                  href={task.questionLink}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-xs text-indigo-400 hover:text-white font-black break-all"
-                                >
-                                  FETCH_TARGET
-                                </a>
-                                {task.answerText && (
-                                  <p className="text-[10px] text-slate-400 font-mono line-clamp-2">
-                                    "{task.answerText}"
-                                  </p>
+                              <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-1">
+                                  <a
+                                    href={task.questionLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-xs text-indigo-400 hover:text-white font-black break-all"
+                                  >
+                                    FETCH_TARGET
+                                  </a>
+                                  {task.answerText && (
+                                    <p className="text-[10px] text-slate-400 font-mono line-clamp-2">
+                                      "{task.answerText}"
+                                    </p>
+                                  )}
+                                </div>
+                                {!isAdmin && task.status === "pending" && (
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      placeholder="Paste answer link..."
+                                      className="bg-black/40 border border-white/10 rounded-2xl px-3 py-2 text-[10px] w-full focus:outline-none focus:border-indigo-500 transition-all font-mono placeholder:text-slate-700"
+                                      value={answerLinks[task.id] || ""}
+                                      onChange={(e) =>
+                                        setAnswerLinks((prev) => ({
+                                          ...prev,
+                                          [task.id]: e.target.value
+                                        }))
+                                      }
+                                      disabled={loadingTaskId === task.id}
+                                    />
+                                    <motion.button
+                                      whileHover={{ scale: 1.08, rotate: 4 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => handleSubmitLiveLink(task, answerLinks[task.id])}
+                                      disabled={loadingTaskId === task.id}
+                                      className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-2xl transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+                                    >
+                                      <Send size={14} />
+                                    </motion.button>
+                                  </div>
                                 )}
                               </div>
                             </td>
