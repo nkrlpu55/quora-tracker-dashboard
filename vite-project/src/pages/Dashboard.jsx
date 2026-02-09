@@ -591,6 +591,11 @@ export default function Dashboard() {
                  <span className="text-[9px] text-slate-500 font-mono font-bold tracking-widest uppercase">Live_Session</span>
                </div>
             </div>
+            {!isAdmin && (
+              <p className="mt-2 text-xs text-slate-300">
+                Welcome back, <span className="font-bold text-emerald-400">{userData.name}</span>.
+              </p>
+            )}
           </div>
         </div>
 
