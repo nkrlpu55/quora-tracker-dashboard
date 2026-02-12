@@ -181,7 +181,7 @@ export default function Login() {
                     <ShieldCheck className="text-indigo-400" size={24} />
                   </div>
                   <div>
-                    <div className="text-white font-black uppercase tracking-wide">Administrator</div>
+                    <div className="text-white font-black uppercase tracking-wide">Admin</div>
                     <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-0.5 group-hover:text-indigo-400 transition-colors">For control & management</div>
                   </div>
                 </div>
