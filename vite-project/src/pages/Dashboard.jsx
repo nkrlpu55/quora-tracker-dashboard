@@ -31,7 +31,11 @@ import {
   Tooltip,
   ResponsiveContainer,
   AreaChart,
-  Area
+  Area,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
 } from "recharts";
 import { db } from "../firebase";
 import {
@@ -79,10 +83,10 @@ export default function Dashboard() {
   const [submissions, setSubmissions] = useState([]);
   const [users, setUsers] = useState([]);
   const [analyticsData, setAnalyticsData] = useState([]);
-  const [newTask, setNewTask] = useState({ 
-    questionLink: '', 
-    answerText: '', 
-    dueAt: '', 
+  const [newTask, setNewTask] = useState({
+    questionLink: '',
+    answerText: '',
+    dueAt: '',
     assignedTo: '',
     topic: ''
   });
@@ -148,7 +152,7 @@ export default function Dashboard() {
         id: doc.id,
         ...doc.data()
       }));
-      
+
       if (isAdmin) {
         setAllTasks(taskList);
         setTasks(taskList);
@@ -284,7 +288,7 @@ export default function Dashboard() {
     // Group submissions by day of week (last 7 days)
     const now = new Date();
     const dayData = {};
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
@@ -296,7 +300,7 @@ export default function Dashboard() {
       if (sub.submittedAt) {
         const subDate = sub.submittedAt.toDate();
         const dayKey = String(subDate.getDate()).padStart(2, '0');
-        
+
         if (dayData[dayKey]) {
           dayData[dayKey].submissions += 1;
           dayData[dayKey].totalScore += sub.scoreDelta || 0;
@@ -308,7 +312,7 @@ export default function Dashboard() {
     const chartData = Object.keys(dayData).map(day => ({
       name: day,
       submissions: dayData[day].submissions,
-      quality: dayData[day].count > 0 
+      quality: dayData[day].count > 0
         ? Math.max(0, Math.min(100, 50 + (dayData[day].totalScore / dayData[day].count) * 10))
         : 0
     }));
@@ -336,10 +340,10 @@ export default function Dashboard() {
         status: "pending"
       });
 
-      setNewTask({ 
-        questionLink: '', 
-        answerText: '', 
-        dueAt: '', 
+      setNewTask({
+        questionLink: '',
+        answerText: '',
+        dueAt: '',
         assignedTo: '',
         topic: ''
       });
@@ -460,10 +464,10 @@ export default function Dashboard() {
 
         const lastSubmission = finalSubs.length > 0
           ? finalSubs
-              .map(s => s.submittedAt?.toDate())
-              .filter(Boolean)
-              .sort((a, b) => b - a)[0]
-              .toLocaleString()
+            .map(s => s.submittedAt?.toDate())
+            .filter(Boolean)
+            .sort((a, b) => b - a)[0]
+            .toLocaleString()
           : "—";
 
         return {
@@ -490,7 +494,7 @@ export default function Dashboard() {
       const avgResponseTime = submissions.length > 0
         ? (submissions.reduce((sum, s) => sum + (s.workingMinutes || 0), 0) / submissions.length / 60).toFixed(1)
         : 0;
-      
+
       return {
         activeQueue: activeTasks,
         trustScore: completedTasks > 0 ? `${((completedTasks / tasks.length) * 100).toFixed(1)}%` : "0%",
@@ -504,7 +508,7 @@ export default function Dashboard() {
       const avgScore = mySubmissions.length > 0
         ? (mySubmissions.reduce((sum, s) => sum + (s.scoreDelta || 0), 0) / mySubmissions.length)
         : 0;
-      
+
       return {
         activeQueue: tasks.filter(t => t.status === "pending" || t.status === "assigned").length,
         trustScore: `${Math.max(0, Math.min(100, 50 + avgScore * 10)).toFixed(1)}%`,
@@ -568,8 +572,8 @@ export default function Dashboard() {
     >
       {/* Animated Background Grid */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.1)_0%,transparent_50%)]" />
-         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.1)_0%,transparent_50%)]" />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
       </div>
 
       <header className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
@@ -583,13 +587,13 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-black tracking-tighter text-white">QACKER<span className="text-indigo-500">CORE</span></h1>
             <div className="flex items-center gap-2 mt-1">
-               <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border ${isAdmin ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}>
-                 {isAdmin ? 'ADMIN' : 'CONTRIBUTOR'} ACCESS
-               </span>
-               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-900 border border-white/5">
-                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                 <span className="text-[9px] text-slate-500 font-mono font-bold tracking-widest uppercase">Live_Session</span>
-               </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border ${isAdmin ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}>
+                {isAdmin ? 'ADMIN' : 'CONTRIBUTOR'} ACCESS
+              </span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-900 border border-white/5">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                <span className="text-[9px] text-slate-500 font-mono font-bold tracking-widest uppercase">Live_Session</span>
+              </div>
             </div>
             {!isAdmin && (
               <p className="mt-2 text-xs text-slate-300">
@@ -598,6 +602,21 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        <nav className="hidden md:flex items-center gap-8">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 text-sm font-bold text-white hover:text-indigo-400 transition-colors cursor-pointer focus:outline-none"
+          >
+            <LayoutDashboard size={16} /> Dashboard
+          </button>
+          <button onClick={() => navigate('/activity')} className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white transition-colors focus:outline-none cursor-pointer">
+            <Activity size={16} /> Activity
+          </button>
+          <button className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white transition-colors focus:outline-none cursor-pointer">
+            <Layers size={16} /> Reports
+          </button>
+        </nav>
 
         <motion.button
           whileHover={{ scale: 1.05, backgroundColor: 'rgba(244, 63, 94, 0.1)' }}
@@ -615,38 +634,139 @@ export default function Dashboard() {
         animate="visible"
         className="max-w-7xl mx-auto space-y-10 relative z-10"
       >
-        {/* Analytics Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard icon={LayoutDashboard} label="Active Queue" value={stats.activeQueue} color="indigo" />
-          <StatCard icon={CheckCircle2} label="Trust Score" value={stats.trustScore} color="emerald" />
-          <StatCard icon={Clock} label="Response" value={stats.response} color="amber" />
-          <StatCard icon={Zap} label="Processing" value={stats.processing} color="purple" />
-        </div>
+        {/* FIRST VIEWPORT GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 flex flex-col gap-6">
+            <GlassCard className="p-6 flex-1 flex flex-col justify-center items-center text-center">
+              <span className="text-xs font-black tracking-widest uppercase text-slate-500 mb-2">Active Queue</span>
+              <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-6xl font-black text-white tracking-tighter">
+                {stats.activeQueue}
+              </motion.div>
+            </GlassCard>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2 space-y-10">
+            <GlassCard className="p-6 flex-1 flex flex-col justify-between items-center relative overflow-hidden group border-white/5 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]">
+              {/* Cinematic Background Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
+
+              <span className="text-[11px] font-black tracking-[0.2em] uppercase text-slate-500 z-10 w-full text-center">Efficiency</span>
+
+              <div className="w-full flex-1 flex items-center justify-center min-h-[180px] z-10 relative my-2">
+                {/* 3D Tilt Container */}
+                <motion.div
+                  initial={{ rotateX: 60, y: 30, opacity: 0 }}
+                  animate={{ rotateX: 45, y: -10, opacity: 1 }}
+                  whileHover={{ rotateX: 25, y: 0 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  style={{ perspective: 1000, transformStyle: "preserve-3d" }}
+                  className="relative flex items-center justify-center"
+                >
+                  <motion.div
+                    animate={{ rotateZ: 360 }}
+                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                    className="w-[220px] h-[220px] flex items-center justify-center"
+                  >
+                    <PieChart width={220} height={220}>
+                      <defs>
+                        <linearGradient id="successGrad3D" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#818cf8" />
+                          <stop offset="50%" stopColor="#6366f1" />
+                          <stop offset="100%" stopColor="#4338ca" />
+                        </linearGradient>
+                        <linearGradient id="remainGrad3D" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#334155" />
+                          <stop offset="100%" stopColor="#0f172a" />
+                        </linearGradient>
+                        <filter id="pieDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="25" stdDeviation="15" floodColor="#000" floodOpacity="0.9" />
+                        </filter>
+                        <filter id="pieGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feGaussianBlur stdDeviation="4" result="blur" />
+                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                      </defs>
+                      <Pie
+                        data={[
+                          { name: "Efficient", value: parseFloat(stats.trustScore) || 0 },
+                          { name: "Remaining", value: Math.max(0, 100 - (parseFloat(stats.trustScore) || 0)) }
+                        ]}
+                        cx={110}
+                        cy={110}
+                        innerRadius={55}
+                        outerRadius={90}
+                        paddingAngle={6}
+                        dataKey="value"
+                        stroke="rgba(255,255,255,0.05)"
+                        strokeWidth={2}
+                        isAnimationActive={true}
+                        animationBegin={200}
+                        animationDuration={2000}
+                        animationEasing="ease-out"
+                        filter="url(#pieDropShadow)"
+                        cornerRadius={6}
+                      >
+                        <Cell fill="url(#successGrad3D)" filter="url(#pieGlow)" />
+                        <Cell fill="url(#remainGrad3D)" />
+                      </Pie>
+                    </PieChart>
+                  </motion.div>
+                </motion.div>
+
+                {/* Floating percentage label (unrotated) */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{
+                    delay: 1,
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
+                  className="absolute inset-0 flex flex-col items-center justify-center mt-[-10px] pointer-events-none"
+                >
+                  <span className="text-2xl font-black text-white drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]">
+                    {stats.trustScore}
+                  </span>
+                </motion.div>
+              </div>
+
+              {/* Custom Legend */}
+              <div className="flex gap-6 z-10 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 w-full justify-center">
+                <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                  <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_#818cf8]"></div>
+                  Efficient
+                </div>
+                <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                  <div className="w-2 h-2 rounded-full bg-slate-700"></div>
+                  Remaining
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="lg:col-span-2">
             {/* Real-time Graph */}
-            <GlassCard className="p-8">
+            <GlassCard className="p-6 flex flex-col h-full min-h-[350px]">
               <div className="flex justify-between items-center mb-8">
                 <div>
                   <h3 className="text-xl font-black text-white flex items-center gap-3">
                     <Activity className="text-indigo-400" />
-                    {isAdmin ? 'NETWORK_THROUGHPUT' : 'PERSONAL_VELOCITY'}
+                    Activity Trend
                   </h3>
                   <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">Historical performance visualization</p>
                 </div>
                 <div className="flex gap-2">
-                   <div className="w-3 h-3 rounded-full bg-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-                   <div className="w-3 h-3 rounded-full bg-white/5" />
+                  <div className="w-3 h-3 rounded-full bg-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                  <div className="w-3 h-3 rounded-full bg-white/5" />
                 </div>
               </div>
-              <div className="h-72">
+              <div className="flex-1 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={analyticsData}>
                     <defs>
                       <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={isAdmin ? '#6366f1' : '#10b981'} stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor={isAdmin ? '#6366f1' : '#10b981'} stopOpacity={0}/>
+                        <stop offset="5%" stopColor={isAdmin ? '#6366f1' : '#10b981'} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={isAdmin ? '#6366f1' : '#10b981'} stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="5 5" stroke="#1e293b" vertical={false} />
@@ -668,7 +788,11 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               </div>
             </GlassCard>
+          </div>
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-10 pt-4">
+          <div className="lg:col-span-2 space-y-10">
             {/* Task List */}
             <div className="space-y-6">
               <button
@@ -679,7 +803,7 @@ export default function Dashboard() {
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <div className="flex flex-col items-center">
                   <h3 className="text-[11px] font-black text-slate-500 tracking-[0.3em] uppercase whitespace-nowrap group-hover:text-indigo-400 transition-colors">
-                    Mission_Registry_ST_004
+                    Task_Log
                   </h3>
                   <p className="text-[9px] text-slate-600 font-mono tracking-[0.25em] uppercase mt-1">
                     Tap to view full history
@@ -711,7 +835,7 @@ export default function Dashboard() {
                             <th className="py-2 px-4">Content</th>
                             <th className="py-2 px-4 hidden md:table-cell">Assigned</th>
                             <th className="py-2 px-4 hidden md:table-cell">Submitted</th>
-                            <th className="py-2 px-4 hidden md:table-cell">Operative</th>
+                            <th className="py-2 px-4 hidden md:table-cell">Contributors</th>
                             <th className="py-2 px-4 text-right">Marks</th>
                           </tr>
                         </thead>
@@ -743,13 +867,12 @@ export default function Dashboard() {
                                 >
                                   <td className="py-3 px-4">
                                     <span
-                                      className={`px-2 py-1 rounded-full text-[9px] font-black uppercase border ${
-                                        task.status === "submitted"
-                                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                          : task.status === "missed"
+                                      className={`px-2 py-1 rounded-full text-[9px] font-black uppercase border ${task.status === "submitted"
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                        : task.status === "missed"
                                           ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                           : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                                      }`}
+                                        }`}
                                     >
                                       {task.status}
                                     </span>
@@ -804,9 +927,8 @@ export default function Dashboard() {
                                     {assignedUser?.name || "Unknown"}
                                   </td>
                                   <td
-                                    className={`py-3 px-4 text-right text-xs font-black ${
-                                      score >= 0 ? "text-emerald-400" : "text-rose-400"
-                                    }`}
+                                    className={`py-3 px-4 text-right text-xs font-black ${score >= 0 ? "text-emerald-400" : "text-rose-400"
+                                      }`}
                                   >
                                     {score > 0 ? "+" : ""}
                                     {score}
@@ -841,30 +963,30 @@ export default function Dashboard() {
             {isAdmin ? (
               <GlassCard className="p-8 sticky top-8 border-indigo-500/20" noHover>
                 <div className="absolute top-0 right-0 p-4">
-                   <Cpu size={40} className="text-indigo-500/10" />
+                  <Cpu size={40} className="text-indigo-500/10" />
                 </div>
                 <h3 className="text-xl font-black mb-8 flex items-center gap-3">
-                  <PlusCircle className="text-indigo-500" /> MISSION_DEPLOY
+                  <PlusCircle className="text-indigo-500" /> CREATE_TASK
                 </h3>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Quora Target URL</label>
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Quora QUESTION URL</label>
                     <input
                       type="text"
                       placeholder="HTTPS://..."
                       className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
                       value={newTask.questionLink}
-                      onChange={(e) => setNewTask({...newTask, questionLink: e.target.value})}
+                      onChange={(e) => setNewTask({ ...newTask, questionLink: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Select Operative</label>
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Select Member</label>
                     <select
                       className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                       value={newTask.assignedTo}
-                      onChange={(e) => setNewTask({...newTask, assignedTo: e.target.value})}
+                      onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
                     >
-                      <option value="">TIER_PERSONNEL...</option>
+                      <option value="">MEMBER...</option>
                       {users.filter(u => u.role === "user").map(user => (
                         <option key={user.id} value={user.id}>
                           {user.name} [LVL_{Math.floor((user.score || 0) / 10)}]
@@ -879,7 +1001,7 @@ export default function Dashboard() {
                       rows={4}
                       className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
                       value={newTask.answerText}
-                      onChange={(e) => setNewTask({...newTask, answerText: e.target.value})}
+                      onChange={(e) => setNewTask({ ...newTask, answerText: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
@@ -888,7 +1010,7 @@ export default function Dashboard() {
                       type="datetime-local"
                       className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                       value={newTask.dueAt}
-                      onChange={(e) => setNewTask({...newTask, dueAt: e.target.value})}
+                      onChange={(e) => setNewTask({ ...newTask, dueAt: e.target.value })}
                     />
                   </div>
                   <motion.button
@@ -897,14 +1019,14 @@ export default function Dashboard() {
                     onClick={handleCreateTask}
                     className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl shadow-[0_20px_40px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                   >
-                    <ShieldCheck size={20} /> INITIALIZE_DEPLOYMENT
+                    <ShieldCheck size={20} /> START_TASK
                   </motion.button>
                 </div>
               </GlassCard>
             ) : (
               <GlassCard className="p-8 sticky top-8 border-emerald-500/20" noHover>
                 <div className="absolute top-0 right-0 p-4">
-                   <Globe size={40} className="text-emerald-500/10" />
+                  <Globe size={40} className="text-emerald-500/10" />
                 </div>
                 <h3 className="text-xl font-black mb-6 flex items-center gap-3">
                   <Award className="text-emerald-400" /> OPERATIVE_PULSE
@@ -931,9 +1053,9 @@ export default function Dashboard() {
                       <span className="text-emerald-400">
                         {tasks.length > 0
                           ? Math.round(
-                              (tasks.filter(t => t.status === "submitted").length / tasks.length) *
-                                100
-                            )
+                            (tasks.filter(t => t.status === "submitted").length / tasks.length) *
+                            100
+                          )
                           : 0}
                         %_LOGGED
                       </span>
@@ -942,12 +1064,11 @@ export default function Dashboard() {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{
-                          width: `${
-                            tasks.length > 0
-                              ? (tasks.filter(t => t.status === "submitted").length / tasks.length) *
-                                100
-                              : 0
-                          }%`
+                          width: `${tasks.length > 0
+                            ? (tasks.filter(t => t.status === "submitted").length / tasks.length) *
+                            100
+                            : 0
+                            }%`
                         }}
                         transition={{ duration: 1.5, ease: "easeOut" }}
                         className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]"
@@ -1028,9 +1149,8 @@ export default function Dashboard() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.03 }}
-                              className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
-                                isCurrentUser ? "bg-emerald-500/5" : ""
-                              }`}
+                              className={`border-b border-white/5 hover:bg-white/5 transition-colors ${isCurrentUser ? "bg-emerald-500/5" : ""
+                                }`}
                             >
                               <td className="py-2 font-black text-slate-400">{rankIcon}</td>
                               <td className="py-2 font-black text-white">
@@ -1040,9 +1160,8 @@ export default function Dashboard() {
                                 )}
                               </td>
                               <td
-                                className={`py-2 text-right font-black ${
-                                  player.totalScore >= 0 ? "text-emerald-400" : "text-rose-400"
-                                }`}
+                                className={`py-2 text-right font-black ${player.totalScore >= 0 ? "text-emerald-400" : "text-rose-400"
+                                  }`}
                               >
                                 {player.totalScore > 0 ? "+" : ""}
                                 {player.totalScore}
@@ -1064,7 +1183,7 @@ export default function Dashboard() {
                   <TrendingUp size={40} className="text-indigo-500/10" />
                 </div>
                 <h3 className="text-xl font-black mb-8 flex items-center gap-3">
-                  <ShieldCheck className="text-indigo-400" /> OPERATIVE_PERFORMANCE
+                  <ShieldCheck className="text-indigo-400" /> TEAM_PERFORMANCE
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
@@ -1086,9 +1205,8 @@ export default function Dashboard() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
-                            index === 0 ? 'bg-indigo-500/5' : ''
-                          }`}
+                          className={`border-b border-white/5 hover:bg-white/5 transition-colors ${index === 0 ? 'bg-indigo-500/5' : ''
+                            }`}
                         >
                           <td className="py-3 text-sm font-black text-slate-400">
                             {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
@@ -1151,7 +1269,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-gradient-to-r from-indigo-500/10 via-slate-900 to-emerald-500/10">
                 <div>
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.35em]">
-                    Mission_Registry_ST_004
+                    Task_Log
                   </p>
                   <p className="text-xs text-slate-400 font-mono mt-1">
                     Complete log of all content assignments and their scores
@@ -1177,7 +1295,7 @@ export default function Dashboard() {
                       <tr className="text-slate-500 border-b border-white/10 text-[9px] uppercase tracking-[0.2em]">
                         <th className="py-3 px-3">Status</th>
                         <th className="py-3 px-3">Content</th>
-                        <th className="py-3 px-3 hidden md:table-cell">Operative</th>
+                        <th className="py-3 px-3 hidden md:table-cell">Contributors</th>
                         <th className="py-3 px-3 hidden md:table-cell">Assigned</th>
                         <th className="py-3 px-3 hidden md:table-cell">Submitted</th>
                         <th className="py-3 px-3 hidden md:table-cell">Deadline</th>
@@ -1217,13 +1335,12 @@ export default function Dashboard() {
                           >
                             <td className="py-3 px-3">
                               <span
-                                className={`px-2 py-1 rounded-full text-[9px] font-black uppercase border ${
-                                  task.status === "submitted"
-                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                                    : task.status === "missed"
+                                className={`px-2 py-1 rounded-full text-[9px] font-black uppercase border ${task.status === "submitted"
+                                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                  : task.status === "missed"
                                     ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
                                     : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                                }`}
+                                  }`}
                               >
                                 {task.status}
                               </span>
@@ -1286,9 +1403,8 @@ export default function Dashboard() {
                               {dueDate || "N/A"}
                             </td>
                             <td
-                              className={`py-3 px-3 text-right text-xs font-black ${
-                                score >= 0 ? "text-emerald-400" : "text-rose-400"
-                              }`}
+                              className={`py-3 px-3 text-right text-xs font-black ${score >= 0 ? "text-emerald-400" : "text-rose-400"
+                                }`}
                             >
                               {score > 0 ? "+" : ""}
                               {score}
