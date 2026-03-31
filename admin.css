@@ -62,13 +62,19 @@ body {
     position: relative;
 }
 
+@media (min-width: 1025px) {
+    body {
+        overflow-y: scroll;
+    }
+}
+
 body::before {
     display: none;
 }
 
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -76,9 +82,16 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-2);
-    border-radius: 2px;
+    background: #9CA3AF;
+    border-radius: 3px;
 }
+
+@media (max-width: 1024px) {
+    ::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 
 input,
 select,

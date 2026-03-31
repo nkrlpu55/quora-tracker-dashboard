@@ -199,11 +199,33 @@
     body>div.w-full.max-w-5xl {
       animation: softEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    @media (min-width: 1025px) {
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #9CA3AF;
+        border-radius: 3px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    }
   </style>
 </head>
 
 <body
-  class="min-h-screen w-full bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden font-sans text-slate-200">
+  class="min-h-screen w-full bg-[#020617] flex items-center justify-center p-6 relative max-md:overflow-hidden md:overflow-y-auto overflow-x-hidden font-sans text-slate-200">
 
   <!-- Background Layer -->
   <div class="absolute inset-0 z-0">
