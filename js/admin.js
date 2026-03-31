@@ -192,8 +192,8 @@ function updateCharts() {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: true, color: 'rgba(255,255,255,0.03)', drawBorder: false }, ticks: { font: {family: 'DM Mono', size: 10}, color: '#52525e' } },
-                    y: { grid: { display: true, color: 'rgba(255,255,255,0.03)', drawBorder: false }, ticks: { font: {family: 'DM Mono', size: 10}, color: '#52525e' }, beginAtZero: true }
+                    x: { grid: { display: true, color: 'rgba(0,0,0,0.05)', drawBorder: false }, ticks: { font: {family: 'DM Mono', size: 10}, color: '#6B7280' } },
+                    y: { grid: { display: true, color: 'rgba(0,0,0,0.05)', drawBorder: false }, ticks: { font: {family: 'DM Mono', size: 10}, color: '#6B7280' }, beginAtZero: true }
                 }
             }
         });
