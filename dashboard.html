@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QackerCore — Operative Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Reusing the precise design tokens from admin.css -->
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        .topbar-badge.user {
+            color: var(--green);
+            border-color: rgba(34, 197, 94, 0.3);
+            background: var(--green-dim);
+        }
+    </style>
+</head>
+
+<body>
+
+<section id="dashboard-page" class="page active">
+    <div class="app-shell">
+        <aside class="app-sidebar" id="app-sidebar-dash">
+            <div class="sidebar-top">
+                <div class="s-wordmark">
+                    <div class="s-icon" style="background: var(--green)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="14" height="14">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                        </svg>
+                    </div>
+                    <div class="s-name">QackerCore <span>Nexus</span></div>
+                </div>
+                <div class="s-session">
+                    <div class="s-session-dot"></div>
+                    <div>
+                        <div class="s-session-role" id="s-role-name">Operative</div>
+                        <div class="s-session-text" id="s-role-tag">SECURE SESSION</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="s-nav-section">Navigation</div>
+                <a class="s-nav-link active" onclick="showPage('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    Dashboard
+                </a>
+                <a class="s-nav-link" onclick="showPage('activity')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Activity
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="s-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign out
+                </button>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-page-title">Operative Dashboard</div>
+                    <div class="topbar-page-sub" id="topbar-sub-dash">Overview · Active Assignments</div>
+                </div>
+                <div class="topbar-right">
+                    <span class="topbar-badge user" id="topbar-badge-dash">CONTRIBUTOR</span>
+                    <button class="hamburger-btn" onclick="openDrawer('dash')">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dash-content">
+                <div>
+                    <div class="section-hd"><span class="section-title">Overview</span></div>
+                    <div class="kpi-row">
+                        <div class="kpi-card">
+                            <div class="kpi-top">
+                                <span class="kpi-label">Assigned</span>
+                                <div class="kpi-icon" style="background:var(--blue-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                            </div>
+                            <div class="kpi-num" id="kpi-total">—</div>
+                            <div class="kpi-delta">All-time count</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-top">
+                                <span class="kpi-label">Active Queue</span>
+                                <div class="kpi-icon" style="background:var(--amber-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.5" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                            </div>
+                            <div class="kpi-num" id="kpi-pending">—</div>
+                            <div class="kpi-delta">Require attention</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-top">
+                                <span class="kpi-label">Target Score</span>
+                                <div class="kpi-icon" style="background:var(--green-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" width="14" height="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                            </div>
+                            <div class="kpi-num" id="kpi-score">—</div>
+                            <div class="kpi-delta up" id="kpi-eff">—% efficiency</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-top">
+                                <span class="kpi-label">Penalties</span>
+                                <div class="kpi-icon" style="background:var(--red-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.5" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+                            </div>
+                            <div class="kpi-num" id="kpi-missed">—</div>
+                            <div class="kpi-delta down">Missed deadlines</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="chart-card-title">Activity trend</div>
+                        <div class="chart-card-sub">Past 7 days · Submitted missions</div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="area-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-card-title">Action Rating</div>
+                        <div class="chart-card-sub">Timeliness vs Penalties</div>
+                        <div class="donut-wrap">
+                            <canvas id="donut-chart" width="140" height="140"></canvas>
+                            <div class="donut-center">
+                                <span class="donut-pct" id="donut-pct">—</span>
+                                <span class="donut-label">TRUST</span>
+                            </div>
+                        </div>
+                        <div class="donut-legend" id="donut-legend"></div>
+                    </div>
+                </div>
+
+                <div class="main-grid" style="grid-template-columns: 1fr;"> <!-- No side panel needed for Operative dashboard overview -->
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <div style="display:flex;align-items:center;gap:0.7rem">
+                                <span class="table-card-title">Mission Log</span>
+                                <span class="table-card-count" id="task-count">0 entries</span>
+                            </div>
+                            <div class="filter-tabs">
+                                <button class="ftab active" data-filter="all">All</button>
+                                <button class="ftab" data-filter="pending">Pending</button>
+                                <button class="ftab" data-filter="submitted">Submitted</button>
+                            </div>
+                        </div>
+                        <div class="t-scroll">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Target Details</th>
+                                        <th>Assigned</th>
+                                        <th>Deadline</th>
+                                        <th style="min-width: 250px;">Action / Submission</th>
+                                        <th style="text-align:right">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="task-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <button class="btn-ghost-sm" onclick="showPage('activity')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                View History in Activity Center
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="activity-page" class="page">
+    <div class="app-shell">
+        <aside class="app-sidebar" id="app-sidebar-act">
+            <div class="sidebar-top">
+                <div class="s-wordmark">
+                    <div class="s-icon" style="background: var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                    <div class="s-name">QackerCore <span>Nexus</span></div>
+                </div>
+                <div class="s-session">
+                    <div class="s-session-dot"></div>
+                    <div>
+                        <div class="s-session-role" id="s-role-name-act">Operative</div>
+                        <div class="s-session-text" id="s-role-tag-act">SECURE SESSION</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="s-nav-section">Navigation</div>
+                <a class="s-nav-link" onclick="showPage('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    Dashboard
+                </a>
+                <a class="s-nav-link active" onclick="showPage('activity')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Activity
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <button class="s-logout" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign out
+                </button>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-page-title">Activity Center</div>
+                    <div class="topbar-page-sub">Full operative history</div>
+                </div>
+                <div class="topbar-right">
+                    <span class="topbar-badge user" id="topbar-badge-act">CONTRIBUTOR</span>
+                    <button class="hamburger-btn" onclick="openDrawer('act')">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="act-content">
+                <div class="act-hd-row">
+                    <div>
+                        <div class="act-eyebrow">Activity Center</div>
+                        <div class="act-heading">Deployment Log</div>
+                    </div>
+                    <div class="act-stat-chips" id="act-chips">
+                        <div class="act-chip"><div class="act-chip-num text-green-400" id="act-chip-total">0</div><div class="act-chip-lbl">TOTAL LOGS</div></div>
+                        <div class="act-chip"><div class="act-chip-num text-blue-400" id="act-chip-sub">0</div><div class="act-chip-lbl">LIFETIME REPUTATION</div></div>
+                    </div>
+                </div>
+
+                <div class="act-grid" style="grid-template-columns: 1fr;">
+                    <div class="table-card">
+                        <div class="table-card-header" style="border-bottom:0">
+                            <span class="table-card-title">All tasks</span>
+                            <span class="table-card-count" id="act-task-count">0 entries</span>
+                        </div>
+                        <div class="t-scroll">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Target</th>
+                                        <th>Assigned</th>
+                                        <th>Submitted</th>
+                                        <th style="text-align:right">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="act-task-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="mobile-drawer" id="mobile-drawer">
+    <div class="drawer-backdrop" onclick="closeDrawer()"></div>
+    <div class="drawer-panel" id="drawer-panel"></div>
+</div>
+
+<div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon"></span>
+    <span id="toast-msg"></span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="js/dashboard.js" type="module"></script>
+</body>
+</html>
