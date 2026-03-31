@@ -29,8 +29,6 @@ init();
 window.showPage = function(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId + '-page').classList.add('active');
-    document.querySelectorAll('.s-nav-link').forEach(l => l.classList.remove('active'));
-    event.currentTarget.classList.add('active');
 };
 
 window.logout = function() {
@@ -178,15 +176,15 @@ function updateCharts() {
     const areaCtx = document.getElementById('area-chart');
     if(areaCtx && !areaChart) {
         let grad = areaCtx.getContext('2d').createLinearGradient(0,0,0,180);
-        grad.addColorStop(0, 'rgba(34, 197, 94, 0.2)');
-        grad.addColorStop(1, 'rgba(34, 197, 94, 0)');
+        grad.addColorStop(0, 'rgba(53, 58, 95, 0.2)');
+        grad.addColorStop(1, 'rgba(158, 186, 243, 0)');
         
         areaChart = new Chart(areaCtx, {
             type: 'line',
             data: { labels, datasets: [{
-                data, borderColor: '#22c55e', backgroundColor: grad,
+                data, borderColor: '#353A5F', backgroundColor: grad,
                 borderWidth: 2, tension: 0.4, fill: true, 
-                pointRadius: 4, pointBackgroundColor: '#22c55e', pointBorderColor: '#22c55e', pointHitRadius: 10
+                pointRadius: 4, pointBackgroundColor: '#353A5F', pointBorderColor: '#353A5F', pointHitRadius: 10
             }]},
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -217,7 +215,7 @@ function updateCharts() {
                 labels: ['Pending', 'Submitted', 'Missed'],
                 datasets: [{
                     data: [pending, submitted, missed],
-                    backgroundColor: ['#f59e0b', '#22c55e', '#ef4444'],
+                    backgroundColor: ['#D97706', '#059669', '#DC2626'],
                     borderWidth: 0, cutout: '80%'
                 }]
             },
@@ -231,15 +229,15 @@ function updateCharts() {
     const leg = document.getElementById("donut-legend");
     leg.innerHTML = `
         <div class="legend-row">
-            <div class="legend-label"><div class="legend-dot" style="background:#22c55e"></div>Submitted</div>
+            <div class="legend-label"><div class="legend-dot" style="background:#059669"></div>Submitted</div>
             <div class="legend-val">${submitted}</div>
         </div>
         <div class="legend-row">
-            <div class="legend-label"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div>
+            <div class="legend-label"><div class="legend-dot" style="background:#D97706"></div>Pending</div>
             <div class="legend-val">${pending}</div>
         </div>
         <div class="legend-row">
-            <div class="legend-label"><div class="legend-dot" style="background:#ef4444"></div>Missed</div>
+            <div class="legend-label"><div class="legend-dot" style="background:#DC2626"></div>Missed</div>
             <div class="legend-val">${missed}</div>
         </div>
     `;
