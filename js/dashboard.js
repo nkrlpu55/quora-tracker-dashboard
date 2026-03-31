@@ -229,16 +229,20 @@ function updateCharts() {
   const areaCtx = document.getElementById('area-chart');
   if (areaCtx && !areaChart) {
     let grad = areaCtx.getContext('2d').createLinearGradient(0, 0, 0, 180);
-    grad.addColorStop(0, 'rgba(53, 58, 95, 0.2)');
-    grad.addColorStop(1, 'rgba(158, 186, 243, 0)');
+    grad.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+    grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+    let lineGrad = areaCtx.getContext('2d').createLinearGradient(0, 0, areaCtx.clientWidth || 800, 0);
+    lineGrad.addColorStop(0, '#059669');
+    lineGrad.addColorStop(1, '#34D399');
 
     areaChart = new Chart(areaCtx, {
       type: 'line',
       data: {
         labels, datasets: [{
-          data, borderColor: '#353A5F', backgroundColor: grad,
+          data, borderColor: lineGrad, backgroundColor: grad,
           borderWidth: 2, tension: 0.4, fill: true,
-          pointRadius: 4, pointBackgroundColor: '#353A5F', pointBorderColor: '#353A5F', pointHitRadius: 10
+          pointRadius: 4, pointBackgroundColor: '#10B981', pointBorderColor: '#10B981', pointHitRadius: 10
         }]
       },
       options: {

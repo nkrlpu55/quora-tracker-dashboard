@@ -70,131 +70,7 @@
       animation-delay: 2s;
     }
 
-    /* High Contrast Corporate Light Theme Overrides */
-    body.bg-\[\#020617\] {
-      background-color: #F8FAFC !important;
-      color: #111827 !important;
-    }
 
-    /* LEFT section (brand): Clean and light */
-    .bg-\[\#0f172a\] {
-      background-color: #FFFFFF !important;
-      border-color: rgba(0, 0, 0, 0.08) !important;
-    }
-
-    /* RIGHT section (form container): Gradient #353A5F -> #9EBAF3 */
-    .bg-slate-900\/40 {
-      background: linear-gradient(135deg, #353A5F, #9EBAF3) !important;
-      box-shadow: 0 20px 40px -10px rgba(53, 58, 95, 0.3), 0 4px 6px -2px rgba(53, 58, 95, 0.15) !important;
-      border: none !important;
-    }
-
-    /* Clean up text in right section so it's readable on gradient */
-    #form-container h2,
-    #form-container h3,
-    #form-container p,
-    #form-container label,
-    #form-container button.text-slate-500 {
-      color: #FFFFFF !important;
-    }
-
-    #form-container .text-white {
-      color: #FFFFFF !important;
-    }
-
-    #form-container .h-1 {
-      background-color: rgba(255, 255, 255, 0.4) !important;
-    }
-
-    #form-container i {
-      color: #FFFFFF !important;
-      opacity: 0.9 !important;
-    }
-
-    /* Back button fix */
-    #form-container [onclick="setMode('select')"] {
-      color: rgba(255, 255, 255, 0.8) !important;
-    }
-
-    /* Role cards inside right panel with glassmorphism */
-    .bg-white\/\[0\.03\] {
-      background-color: rgba(255, 255, 255, 0.75) !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.5) !important;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .bg-white\/\[0\.03\]:hover {
-      background-color: rgba(255, 255, 255, 0.85) !important;
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12) !important;
-    }
-
-    .bg-white\/\[0\.03\] .text-white {
-      color: #111827 !important;
-    }
-
-    .bg-white\/\[0\.03\] .text-slate-500 {
-      color: #4B5563 !important;
-    }
-
-    .bg-white\/\[0\.03\] i {
-      color: #353A5F !important;
-    }
-
-    /* Icon wrapper inside role cards */
-    .bg-white\/\[0\.03\] .bg-indigo-500\/10,
-    .bg-white\/\[0\.03\] .bg-emerald-500\/10 {
-      background-color: rgba(53, 58, 95, 0.1) !important;
-    }
-
-    /* Form inputs inside right panel */
-    .bg-black\/40 {
-      background-color: rgba(255, 255, 255, 0.9) !important;
-      border-color: rgba(255, 255, 255, 0.5) !important;
-      color: #111827 !important;
-    }
-
-    input::placeholder {
-      color: #6B7280 !important;
-      font-weight: 500;
-    }
-
-    input {
-      font-weight: 500 !important;
-    }
-
-    /* Primary buttons */
-    #admin-submit,
-    #user-submit {
-      background: linear-gradient(135deg, #353A5F, #9EBAF3) !important;
-      border: 1px solid rgba(255, 255, 255, 0.3) !important;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
-      color: #FFFFFF !important;
-    }
-
-    /* Universal Button Animations */
-    button {
-      transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease !important;
-    }
-
-    button:hover {
-      filter: brightness(1.05) !important;
-      transform: translateY(-2px) !important;
-    }
-
-    /* Brand Left text colors */
-    .bg-\[\#0f172a\] .text-white {
-      color: #111827 !important;
-    }
-
-    .bg-\[\#0f172a\] .text-slate-400 {
-      color: #4B5563 !important;
-    }
-
-    .bg-\[\#0f172a\] .text-slate-500 {
-      color: #6B7280 !important;
-    }
 
     body>div.w-full.max-w-5xl {
       animation: softEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -225,7 +101,7 @@
 </head>
 
 <body
-  class="min-h-screen w-full bg-[#020617] flex items-center justify-center p-6 relative max-md:overflow-hidden md:overflow-y-auto overflow-x-hidden font-sans text-slate-200">
+  class="min-h-screen w-full bg-gradient-to-br from-[#0e1224] to-[#1a2245] flex items-center justify-center p-6 relative max-md:overflow-hidden md:overflow-y-auto overflow-x-hidden font-sans text-slate-200">
 
   <!-- Background Layer -->
   <div class="absolute inset-0 z-0">
