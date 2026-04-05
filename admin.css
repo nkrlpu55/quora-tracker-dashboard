@@ -2,30 +2,30 @@
    DESIGN TOKENS
 ═══════════════════════════════════════════ */
 :root {
-    --bg: linear-gradient(135deg, #0e1224 0%, #1a2245 100%);
-    --bg-1: linear-gradient(180deg, #232c56 0%, #1e2548 100%);
-    --bg-2: #2b366a;
-    --bg-3: #353a5f;
-    --surface: #232c56;
-    --surface-2: #2b366a;
-    --border: rgba(123, 155, 225, 0.15);
-    --border-2: rgba(123, 155, 225, 0.25);
+    --bg: #EEF3FA;
+    --bg-1: #FFFFFF;
+    --bg-2: #F8FAFC;
+    --bg-3: #F4F7FA;
+    --surface: #FFFFFF;
+    --surface-2: #FFFFFF;
+    --border: rgba(0, 0, 0, 0.04);
+    --border-2: rgba(0, 0, 0, 0.06);
 
-    --blue: #7B9BE1;
-    --blue-dim: rgba(123, 155, 225, 0.15);
-    --blue-glow: rgba(123, 155, 225, 0.3);
+    --blue: #353A5F;
+    --blue-dim: #E6EDFB;
+    --blue-glow: rgba(53, 58, 95, 0.15);
 
     --green: #10B981;
-    --green-dim: rgba(16, 185, 129, 0.15);
-    --red: #FB7185;
-    --red-dim: rgba(251, 113, 133, 0.15);
-    --amber: #FBBF24;
-    --amber-dim: rgba(251, 191, 36, 0.15);
+    --green-dim: #E8F8F2;
+    --red: #EF4444;
+    --red-dim: #FEECEB;
+    --amber: #F59E0B;
+    --amber-dim: #FEF4E6;
 
-    --text: #F8FAFC;
-    --text-2: #CBD5E1;
-    --text-3: #94A3B8;
-    --text-4: #64748B;
+    --text: #1E293B;
+    --text-2: #475569;
+    --text-3: #64748B;
+    --text-4: #9CA3AF;
 
     --f-serif: 'Instrument Serif', Georgia, serif;
     --f-sans: 'Geist', system-ui, sans-serif;
@@ -34,8 +34,8 @@
     --r: 8px;
     --r-lg: 16px;
     --r-xl: 20px;
-    --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --glass-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.6);
+    --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --glass-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 /* ═══════════════════════════════════════════
@@ -56,12 +56,10 @@ html {
 
 body {
     background: var(--bg);
-    background-attachment: fixed;
     color: var(--text);
     font-family: var(--f-sans);
     overflow-x: hidden;
     position: relative;
-    min-height: 100vh;
 }
 
 @media (min-width: 1025px) {
@@ -84,7 +82,7 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #9CA3AF;
+    background: #9098a7;
     border-radius: 3px;
 }
 
@@ -130,7 +128,7 @@ a {
 .app-sidebar {
     width: 250px;
     flex-shrink: 0;
-    background: var(--bg-1);
+    background: #FFFFFF;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -304,20 +302,17 @@ a {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    background: transparent;
+    background: var(--bg);
 }
 
 /* Top bar */
 .topbar {
     height: 70px;
-    background: var(--bg-1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-
+    background: transparent;
+    border-bottom: none;
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    display: flex;
     padding: 0 1.8rem;
     position: sticky;
     top: 0;
@@ -363,7 +358,7 @@ a {
 .topbar-badge.admin {
     color: #FFFFFF;
     border: none;
-    background: linear-gradient(135deg, #353A5F, #7B9BE1);
+    background: #353A5F;
 }
 
 .hamburger-btn {
@@ -659,9 +654,9 @@ a {
 }
 
 .ftab.active {
-    background: rgba(123, 155, 225, 0.2);
+    background: #DFE7F8;
     border-color: transparent;
-    color: var(--blue);
+    color: #353A5F;
     font-weight: 600;
 }
 
